@@ -90,144 +90,37 @@ public partial class User_Summary : System.Web.UI.Page
 
         grid_user_summary.DataSource = dt;
         grid_user_summary.DataBind();
+
     }
     protected void btn_export_Click(object sender, EventArgs e)
     {
-        if (ViewState["filtered_data"] != null)
+        Response.Clear();
+        Response.Buffer = true;
+        Response.AddHeader("content-disposition", "attachment;filename=UserSummary.xls");
+        Response.Charset = "";
+        Response.ContentType = "application/vnd.ms-excel";
+
+        grid_user_summary.AllowPaging = false;
+
+        bind_data(); // ✅ MUST CALL AGAIN
+
+        using (System.IO.StringWriter sw = new System.IO.StringWriter())
         {
-            DataTable dt = ViewState["filtered_data"] as DataTable;
-
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                DataTable exportDt = new DataTable();
-                exportDt.Columns.Add("Ward", typeof(string));
-                exportDt.Columns.Add("Total User", typeof(int));
-                exportDt.Columns.Add("Active User", typeof(int));
-                exportDt.Columns.Add("Inactive User", typeof(int));
-                exportDt.Columns.Add("Admin", typeof(int));
-                exportDt.Columns.Add("Sub Admin", typeof(int));
-                exportDt.Columns.Add("Sakti", typeof(int));
-                exportDt.Columns.Add("Booth Pramukh", typeof(int));
-                exportDt.Columns.Add("Sah Sakti", typeof(int));
-                exportDt.Columns.Add("Sah Booth Pramukh", typeof(int));
-                exportDt.Columns.Add("Karykarta", typeof(int));
-                exportDt.Columns.Add("Phonebook User", typeof(int));
-                exportDt.Columns.Add("Phonebook Voter", typeof(int));
-                foreach (DataRow row in dt.Rows)
-                {
-                    exportDt.Rows.Add(
-                        row["ward_no"], row["total_user"], row["total_active_user"], row["total_inactive_user"], row["admin"], row["sub_admin"], row["sakti"], row["booth_pramukh"], row["sah_sakti"], row["sah_booth_pramukh"], row["karykarta"], row["phonebook_match_user"], row["phonebook_match_voter"]
-                    );
-                }
-                DataRow totalRow = exportDt.NewRow();
-                totalRow["Ward"] = "Total";
-
-                foreach (DataColumn col in exportDt.Columns)
-                {
-                    if (col.ColumnName != "Ward")
-                    {
-                        int sum = 0;
-                        foreach (DataRow row in exportDt.Rows)
-                        {
-                            if (row[col] != DBNull.Value)
-                                sum += Convert.ToInt32(row[col]);
-                        }
-                        totalRow[col] = sum;
-                    }
-                }
-                exportDt.Rows.Add(totalRow);
-
-                using (var wb = new ClosedXML.Excel.XLWorkbook())
-                {
-                    var ws = wb.Worksheets.Add("FilteredData");
-                    int currentCol = 1;
-                    foreach (DataColumn col in exportDt.Columns)
-                    {
-                        var headerCell = ws.Cell(1, currentCol);
-                        headerCell.Value = col.ColumnName;
-                        headerCell.Style.Font.Bold = true;
-                        headerCell.Style.Font.FontColor = XLColor.Black;
-                        headerCell.Style.Fill.BackgroundColor = XLColor.White;
-                        headerCell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                        headerCell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        headerCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                        if (col.ColumnName == "Active User")
-                        {
-                            headerCell.Style.Font.FontColor = XLColor.White;
-                            headerCell.Style.Fill.BackgroundColor = XLColor.FromHtml("#3cae4d"); // green
-                        }
-                        else if (col.ColumnName == "Inactive User")
-                        {
-                            headerCell.Style.Font.FontColor = XLColor.White;
-                            headerCell.Style.Fill.BackgroundColor = XLColor.FromHtml("#f11702"); // red
-                        }
-                        else if (col.ColumnName == "Phonebook User" || col.ColumnName == "Phonebook Voter")
-                        {
-                            headerCell.Style.Font.FontColor = XLColor.White;
-                            headerCell.Style.Fill.BackgroundColor = XLColor.FromHtml("#4f74c5"); // blue
-                        }
-                        else
-                            headerCell.Style.Fill.BackgroundColor = XLColor.FromHtml("#eeeeee");
-
-                        currentCol++;
-                    }
-                    int currentRow = 2;
-                    foreach (DataRow row in exportDt.Rows)
-                    {
-                        currentCol = 1;
-                        foreach (DataColumn col in exportDt.Columns)
-                        {
-                            var cell = ws.Cell(currentRow, currentCol);
-                            cell.Value = row[col.ColumnName];
-                            cell.Style.Font.FontName = "Calibri";
-                            cell.Style.Font.FontSize = 11;
-                            cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                            cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                            cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                            if (row["Ward"].ToString() == "Total")
-                            {
-                                cell.Style.Fill.BackgroundColor = XLColor.Black;
-                                cell.Style.Font.FontColor = XLColor.White;
-                                cell.Style.Font.Bold = true;
-                            }
-                            else if (col.ColumnName == "Active User")
-                                cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#e3efda");
-                            else if (col.ColumnName == "Inactive User")
-                                cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#f9e4d6");
-                            else if (col.ColumnName == "Phonebook User" || col.ColumnName == "Phonebook Voter")
-                                cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#dfebf7");
-                            else
-                                cell.Style.Fill.BackgroundColor = XLColor.White;
-
-                            currentCol++;
-                        }
-                        currentRow++;
-                    }
-                    ws.Columns().AdjustToContents();
-                    foreach (var col in ws.Columns())
-                    {
-                        if (col.Width < 10)
-                            col.Width = 10;
-                    }
-                    ws.Range(1, 1, 1, exportDt.Columns.Count).SetAutoFilter();
-                    Response.Clear();
-                    Response.Buffer = true;
-                    string date = DateTime.UtcNow.ToString("yyyyMMdd_HHmm");
-                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    Response.AddHeader("content-disposition", "attachment;filename=Report_" + date + ".xlsx");
-                    using (var ms = new System.IO.MemoryStream())
-                    {
-                        wb.SaveAs(ms);
-                        ms.WriteTo(Response.OutputStream);
-                    }
-                    Response.Flush();
-                    HttpContext.Current.ApplicationInstance.CompleteRequest();
-                }
-            }
+            HtmlTextWriter hw = new HtmlTextWriter(sw);
+            grid_user_summary.RenderControl(hw);
+            Response.Output.Write(sw.ToString());
         }
 
-
+        Response.Flush();
+        Response.End();
     }
+
+    public override void VerifyRenderingInServerForm(Control control)
+    {
+        // required
+    }
+
+
 
     protected void ddl_district_SelectedIndexChanged(object sender, EventArgs e)
     {

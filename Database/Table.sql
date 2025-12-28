@@ -50,6 +50,7 @@ CREATE TABLE tbl_user_summary
 
     booth_pramukh INT NOT NULL DEFAULT 0,
     active_booth_pramukh INT NOT NULL DEFAULT 0,
+	booth_active  INT NOT NULL DEFAULT 0,
 
     sah_sakti INT NOT NULL DEFAULT 0,
     active_sah_sakti INT NOT NULL DEFAULT 0,

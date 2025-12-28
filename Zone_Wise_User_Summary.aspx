@@ -73,6 +73,11 @@
                             </ItemTemplate>
                         </asp:TemplateField>
 
+                        <asp:TemplateField HeaderText="Total User">
+                            <ItemStyle CssClass="text-center" />
+                            <ItemTemplate><%# Eval("total_user") %></ItemTemplate>
+                        </asp:TemplateField>
+
                         <asp:TemplateField HeaderText="Active User">
                             <ItemStyle CssClass="bg_active text-white text-center" />
                             <ItemTemplate><%# Eval("total_active") %></ItemTemplate>
@@ -87,33 +92,47 @@
                             <ItemStyle CssClass="text-center" />
                             <ItemTemplate><%# Eval("admin") %></ItemTemplate>
                         </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Active Admin" SortExpression="active_admin">
+                            <ItemStyle CssClass="text-center" />
+                            <ItemTemplate><%# Eval("active_admin") %></ItemTemplate>
+                        </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="Sub Admin" SortExpression="sub_admin">
                             <ItemStyle CssClass="text-center" />
                             <ItemTemplate><%# Eval("sub_admin") %></ItemTemplate>
                         </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Active Sub Admin" SortExpression="active_sub_admin">
+                            <ItemStyle CssClass="text-center" />
+                            <ItemTemplate><%# Eval("active_sub_admin") %></ItemTemplate>
+                        </asp:TemplateField>
+
 
                         <asp:TemplateField HeaderText="Sakti" SortExpression="sakti">
                             <ItemStyle CssClass="text-center" />
                             <ItemTemplate><%# Eval("sakti") %></ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Active Sakti" SortExpression="active_sakti">
+                            <ItemStyle CssClass="text-center" />
+                            <ItemTemplate><%# Eval("active_sakti") %></ItemTemplate>
                         </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="Booth Pramukh" SortExpression="booth_pramukh">
                             <ItemStyle CssClass="text-center" />
                             <ItemTemplate><%# Eval("booth_pramukh") %></ItemTemplate>
                         </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Active Booth Pramukh" SortExpression="active_booth_pramukh">
+                            <ItemStyle CssClass="text-center" />
+                            <ItemTemplate><%# Eval("active_booth_pramukh") %></ItemTemplate>
+                        </asp:TemplateField>
 
-                        <%-- <asp:TemplateField HeaderText="Sah Sakti" SortExpression="sah_sakti">
-                            <ItemTemplate><%# Eval("sah_sakti") %></ItemTemplate>
-                        </asp:TemplateField>--%>
-
-                        <%--  <asp:TemplateField HeaderText="Sah Booth Pramukh" SortExpression="sah_booth_pramukh">
-                            <ItemTemplate><%# Eval("sah_booth_pramukh") %></ItemTemplate>
-                        </asp:TemplateField>--%>
 
                         <asp:TemplateField HeaderText="Karykarta" SortExpression="karykarta">
                             <ItemStyle CssClass="text-center" />
                             <ItemTemplate><%# Eval("karykarta") %></ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Active Karykarta" SortExpression="active_karykarta">
+                            <ItemStyle CssClass="text-center" />
+                            <ItemTemplate><%# Eval("active_karykarta") %></ItemTemplate>
                         </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="Phonebook User" SortExpression="phonebook_match_user">

@@ -27,7 +27,8 @@ public partial class Home : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            Response.Redirect("Message.aspx?ex=" + ex.Message);
+            throw;
+            //Response.Redirect("Message.aspx?ex=" + ex.Message);
         }
     }
 
@@ -38,23 +39,52 @@ public partial class Home : System.Web.UI.Page
             DataSet ds = BAL_Report.dis_admin_dash();
             if (ds.Tables.Count > 0)
             {
-                lbl_total_user.Text = ds.Tables[0].Rows[0]["total_user"].ToString();
-                lbl_active_user.Text = ds.Tables[0].Rows[0]["total_active"].ToString();
-                lbl_inactive_user.Text = ds.Tables[0].Rows[0]["total_inactive"].ToString();
 
-                lbl_total_survey.Text = ds.Tables[1].Rows[0]["survey_done"].ToString();
-                lbl_phonebook_user.Text = ds.Tables[0].Rows[0]["phonebook_match_user"].ToString();
-                lbl_phonebook_voter.Text = ds.Tables[0].Rows[0]["phonebook_match_voter"].ToString();
+                //------- Ward ---------//
+                lbl_active_ward.Text = ds.Tables[0].Rows[0]["total_ward_active"].ToString();
+                lbl_not_active_ward.Text = ds.Tables[0].Rows[0]["total_ward_inactive"].ToString();
 
-                bind_chart(ds.Tables[0].Rows[0]["phonebook_match_voter"].ToString());
+
+                //------- Booth ---------//
+                lbl_total_booth.Text = ds.Tables[1].Rows[0]["total_booth"].ToString();
+                lbl_active_booth.Text = ds.Tables[1].Rows[0]["booth_active"].ToString();
+                lbl_not_active_booth.Text = ds.Tables[1].Rows[0]["not_active_booth"].ToString();
+
+                //------- User ---------//
+                lbl_total_user.Text = ds.Tables[2].Rows[0]["total_user"].ToString();
+                lbl_active_total_user.Text = ds.Tables[2].Rows[0]["total_active_user"].ToString();
+                lbl_inactive_total_user.Text = ds.Tables[2].Rows[0]["total_inactive_user"].ToString();
+                BindUserChart(Convert.ToInt32(ds.Tables[2].Rows[0]["total_user"].ToString()), Convert.ToInt32(ds.Tables[2].Rows[0]["total_active_user"].ToString()));
+
+                //------- Zone Wise Active User ---------//
+                list_zone_user.DataSource = ds.Tables[3];
+                list_zone_user.DataBind();
+
+                BindPhonebookVoterChart(10354316, Convert.ToInt32(ds.Tables[4].Rows[0]["phonebook_match_voters"].ToString()));
+
+                //------- Zone Wise Active User ---------//
+                lbl_total_survey.Text = ds.Tables[5].Rows[0]["survey_done"].ToString();
+                lbl_postive.Text = ds.Tables[5].Rows[0]["positive"].ToString();
+                lbl_negetive.Text = ds.Tables[5].Rows[0]["negative"].ToString();
+                lbl_doubtful.Text = ds.Tables[5].Rows[0]["doubtful"].ToString();
+                lbl_cantsay.Text = ds.Tables[5].Rows[0]["cant_say"].ToString();
+
 
                 bind_survey_bar_chart(
-                        Convert.ToInt32(ds.Tables[1].Rows[0]["positive"].ToString()),
-                        Convert.ToInt32(ds.Tables[1].Rows[0]["negative"].ToString()),
-                        Convert.ToInt32(ds.Tables[1].Rows[0]["doubtful"].ToString()),
-                        Convert.ToInt32(ds.Tables[1].Rows[0]["cant_say"].ToString())
+                        Convert.ToInt32(ds.Tables[5].Rows[0]["positive"].ToString()),
+                        Convert.ToInt32(ds.Tables[5].Rows[0]["negative"].ToString()),
+                        Convert.ToInt32(ds.Tables[5].Rows[0]["doubtful"].ToString()),
+                        Convert.ToInt32(ds.Tables[5].Rows[0]["cant_say"].ToString())
 
                         );
+
+                //--------------- Slip ------------------//
+                BindSlipChart(10354316, 0);
+
+                //lbl_phonebook_user.Text = ds.Tables[0].Rows[0]["phonebook_match_user"].ToString();
+                //lbl_phonebook_voter.Text = ds.Tables[0].Rows[0]["phonebook_match_voter"].ToString();
+
+                //bind_chart(ds.Tables[0].Rows[0]["phonebook_match_voter"].ToString());
             }
         }
         catch (Exception)
@@ -64,74 +94,106 @@ public partial class Home : System.Web.UI.Page
         }
     }
 
-    public void bind_chart(string match_Voter)
+    public void BindUserChart(int total, int active)
     {
-        int totalVoter = 10354316; // Replace with your DB value
-        int matchVoter = Convert.ToInt32(match_Voter);  // Replace with your DB value
-        int unmatchVoter = totalVoter - matchVoter;
+        int inactive = total - active;
 
+        // Calculate remaining value for pie segments if needed
+        // Here, we assume total = active + notActive
         string script = string.Format(@"
-            var ctx = document.getElementById('voterChart').getContext('2d');
-            var voterChart = new Chart(ctx, {{
-                type: 'pie',
-                data: {{
-                    labels: ['Matched Voter', 'Unmatched Voter'],
-                    datasets: [{{
-                        data: [{0}, {1}],
-                        backgroundColor: ['#28a745', '#dc3545']
-                    }}]
-                }},
-                options: {{
-                    responsive: true,
-                    plugins: {{
-                        legend: {{
-                            position: 'bottom'
-                        }}
-                    }}
-                }}
-            }});", matchVoter, unmatchVoter);
-
-        ClientScript.RegisterStartupScript(this.GetType(), "voterChart", script, true);
-    }
-
-    public void bind_survey_chart(
-    int positive,
-    int negative,
-    int doubtful,
-    int cantSay
-)
-    {
-        string script = string.Format(@"
-        var ctx2 = document.getElementById('surveyChart').getContext('2d');
-        var surveyChart = new Chart(ctx2, {{
-            type: 'pie',
+        var ctx = document.getElementById('usersPie').getContext('2d');
+        var userChart = new Chart(ctx, {{
+            type: 'doughnut',
             data: {{
-                labels: ['Positive', 'Negative', 'Doubtful', 'Can’t Say'],
                 datasets: [{{
-                    data: [{0}, {1}, {2}, {3}],
-                    backgroundColor: [
-                        '#198754',  // green
-                        '#dc3545',  // red
-                        '#ffc107',  // yellow
-                        '#6c757d'   // gray
-                    ]
+                    data: [{0}, {1}, {2}],
+                    backgroundColor: ['#007bff', '#28a745', '#dc3545']
                 }}]
             }},
             options: {{
                 responsive: true,
                 plugins: {{
                     legend: {{
-                        position: 'bottom'
+                        display: false
+                    }},
+                    tooltip: {{
+                        enabled: true
                     }}
                 }}
             }}
-        }});",
-            positive, negative, doubtful, cantSay
-        );
+        }});
+    ", total, active, inactive);
+
+        ClientScript.RegisterStartupScript(this.GetType(), "userChart", script, true);
+    }
+
+    public void BindPhonebookVoterChart(int totalVoter, int matchedVoter)
+    {
+        int remainingVoter = totalVoter - matchedVoter;
+
+        string script = string.Format(@"
+        var ctx = document.getElementById('phonebookChart').getContext('2d');
+        new Chart(ctx, {{
+            type: 'doughnut',
+            data: {{
+                datasets: [{{
+                    data: [{0}, {1}],
+                    backgroundColor: ['#007bff', '#28a745']
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                plugins: {{
+                    legend: {{
+                        display: false
+                    }},
+                    tooltip: {{
+                        enabled: true
+                    }}
+                }}
+            }}
+        }});
+    ", remainingVoter, matchedVoter);
 
         ClientScript.RegisterStartupScript(
             this.GetType(),
-            "surveyChart",
+            "phonebookChart",
+            script,
+            true
+        );
+    }
+
+    public void BindSlipChart(int totalVoter, int slipsend)
+    {
+        int remainingVoter = totalVoter - slipsend;
+
+        string script = string.Format(@"
+        var ctx = document.getElementById('SlipPie').getContext('2d');
+        new Chart(ctx, {{
+            type: 'doughnut',
+            data: {{
+                datasets: [{{
+                    data: [{0}, {1}],
+                    backgroundColor: ['#d13a45', '#28a745']
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                plugins: {{
+                    legend: {{
+                        display: false
+                    }},
+                    tooltip: {{
+                        enabled: true
+                    }}
+                }}
+            }}
+        }});
+    ", remainingVoter, slipsend);
+
+        ClientScript.RegisterStartupScript(
+            this.GetType(),
+            "SlipPie",
             script,
             true
         );
@@ -145,55 +207,53 @@ public partial class Home : System.Web.UI.Page
      int cantSay
  )
     {
-        string script = string.Format(@"
-        var ctx3 = document.getElementById('surveyBarChart').getContext('2d');
-        var surveyBarChart = new Chart(ctx3, {{
+        string script = @"
+        var ctx = document.getElementById('surveyBarChart').getContext('2d');
+
+        if (window.surveyChart) {
+            window.surveyChart.destroy();
+        }
+
+        window.surveyChart = new Chart(ctx, {
             type: 'bar',
-            data: {{
+            data: {
                 labels: ['Positive', 'Negative', 'Doubtful', 'Cant Say'],
-                datasets: [{{
-                    label: 'Survey Count',
-                    data: [{0}, {1}, {2}, {3}],
+                datasets: [{
+                    data: [" + positive + ", " + negative + ", " + doubtful + ", " + cantSay + @"],
                     backgroundColor: [
-                        '#198754',
+                        '#28a745',
                         '#dc3545',
-                        '#ffc107',
+                        '#fd7e14',
                         '#6c757d'
-                    ]
-                }}]
-            }},
-            options: {{
+                    ],
+                    borderRadius: 6,
+                    barThickness: 40
+                }]
+            },
+            options: {
                 responsive: true,
-                scales: {{
-                    y: {{
-                        beginAtZero: true,
-                        ticks: {{
-                            precision: 0
-                        }}
-                    }}
-                }},
-                plugins: {{
-                    legend: {{
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
                         display: false
-                    }},
-                    datalabels: {{
-                        anchor: 'end',
-                        align: 'top',
-                        color: '#000',
-                        font: {{
-                            weight: 'bold',
-                            size: 13
-                        }},
-                        formatter: function(value) {{
-                            return value;
-                        }}
-                    }}
-                }}
-            }},
-            plugins: [ChartDataLabels]
-        }});",
-            positive, negative, doubtful, cantSay
-        );
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    ";
 
         ClientScript.RegisterStartupScript(
             this.GetType(),
@@ -202,6 +262,7 @@ public partial class Home : System.Web.UI.Page
             true
         );
     }
+
 
 
 

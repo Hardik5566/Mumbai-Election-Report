@@ -31,9 +31,38 @@ body {
     color: #4c5258;
     letter-spacing: .5px;
     font-family: Roboto, sans-serif;
-    background-color: #e5e8ff !important;
+    background-color: #e4e6ed !important;
     overflow-x: hidden;
 }
+
+
+/* Default: show header */
+header {
+    display: block;
+}
+
+/* Hide on larger screens (desktop) */
+@media (min-width: 992px) {
+    header {
+        display: none;
+    }
+
+    .page-content {
+        margin-top: 0 !important;
+    }
+}
+
+/* Show on mobile (less than 992px) */
+@media (max-width: 991.98px) {
+    header {
+        display: block;
+    }
+
+    .page-content {
+        margin-top: 60px !important;
+    }
+}
+
 
 .wrapper {
     width: auto;

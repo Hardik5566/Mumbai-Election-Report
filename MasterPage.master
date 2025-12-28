@@ -143,6 +143,14 @@
                             <div class="menu-title">Zone Wise User Report</div>
                         </a>
                     </li>
+                    <li>
+                        <a href="Booth_Pramukh_Creation_Summary.aspx">
+                            <div class="parent-icon">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div class="menu-title">Booth Pramukh Report</div>
+                        </a>
+                    </li>
                     <li class="menu-label">SURVEY REPORT</li>
                     <li>
                         <a href="Survey_Summary.aspx">
@@ -156,9 +164,9 @@
                 <!--end navigation-->
             </aside>
             <main class="page-content">
-            <asp:ContentPlaceHolder ID="body" runat="server">
-            </asp:ContentPlaceHolder>
-             </main>
+                <asp:ContentPlaceHolder ID="body" runat="server">
+                </asp:ContentPlaceHolder>
+            </main>
 
 
         </div>

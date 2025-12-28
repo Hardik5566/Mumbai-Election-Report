@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="User_Summary.aspx.cs" Inherits="User_Summary" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.master" EnableEventValidation="false" AutoEventWireup="true" CodeFile="User_Summary.aspx.cs" Inherits="User_Summary" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="title" runat="Server">
     Customer
@@ -39,7 +39,7 @@
         <div class="ms-auto btn_header">
             <div class="btn-group">
                 <asp:Button ID="btn_export" class="btn btn-sm btn-danger btn_add" OnClick="btn_export_Click" runat="server" Text="Export" />
-               <%-- <button type="button" class="btn btn-sm btn-danger btn_add" data-bs-toggle="modal" data-bs-target="#modal_add">Export</button>--%>
+                <%-- <button type="button" class="btn btn-sm btn-danger btn_add" data-bs-toggle="modal" data-bs-target="#modal_add">Export</button>--%>
             </div>
         </div>
     </div>
@@ -75,54 +75,81 @@
                             <ItemTemplate><%# Eval("ward_no") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Total User" SortExpression="total_user">
-                            <ItemTemplate><%# Eval("total_user") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Total User" SortExpression="total_users">
+                            <ItemTemplate><%# Eval("total_users") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Active User" SortExpression="total_active_user">
+                        <asp:TemplateField HeaderText="Active User" SortExpression="total_active">
                             <ItemStyle CssClass="bg_active text-white text-center" />
-                            <ItemTemplate><%# Eval("total_active_user") %></ItemTemplate>
+                            <ItemTemplate><%# Eval("total_active") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="In-Active User" SortExpression="total_inactive_user">
+                        <asp:TemplateField HeaderText="In-Active User" SortExpression="total_inactive">
                             <ItemStyle CssClass="bg_notactive text-white text-center" />
-                            <ItemTemplate><%# Eval("total_inactive_user") %></ItemTemplate>
+                            <ItemTemplate><%# Eval("total_inactive") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Admin" SortExpression="admin">
-                            <ItemTemplate><%# Eval("admin") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Admin" SortExpression="total_admin">
+                            <ItemTemplate><%# Eval("total_admin") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Sub Admin" SortExpression="sub_admin">
-                            <ItemTemplate><%# Eval("sub_admin") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Active Admin" SortExpression="total_active_admin">
+                            <ItemTemplate><%# Eval("total_active_admin") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Sakti" SortExpression="sakti">
-                            <ItemTemplate><%# Eval("sakti") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Sub Admin" SortExpression="total_sub_admin">
+                            <ItemTemplate><%# Eval("total_sub_admin") %></ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Active Sub Admin" SortExpression="total_active_sub_admin">
+                            <ItemTemplate><%# Eval("total_active_sub_admin") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Booth Pramukh" SortExpression="booth_pramukh">
-                            <ItemTemplate><%# Eval("booth_pramukh") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Sakti" SortExpression="total_saktikendra_pramukh">
+                            <ItemTemplate><%# Eval("total_saktikendra_pramukh") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Sah Sakti" SortExpression="sah_sakti">
-                            <ItemTemplate><%# Eval("sah_sakti") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Active Sakti" SortExpression="total_active_saktikendra_pramukh">
+                            <ItemTemplate><%# Eval("total_active_saktikendra_pramukh") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Sah Booth Pramukh" SortExpression="sah_booth_pramukh">
-                            <ItemTemplate><%# Eval("sah_booth_pramukh") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Booth Pramukh" SortExpression="total_booth_pramukh">
+                            <ItemTemplate><%# Eval("total_booth_pramukh") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Karykarta" SortExpression="karykarta">
-                            <ItemTemplate><%# Eval("karykarta") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Active Booth Pramukh" SortExpression="total_active_booth_pramukh">
+                            <ItemTemplate><%# Eval("total_active_booth_pramukh") %></ItemTemplate>
+                        </asp:TemplateField>
+
+                        <asp:TemplateField HeaderText="Sah Sakti" SortExpression="total_sah_saktikendra_pramukh">
+                            <ItemTemplate><%# Eval("total_sah_saktikendra_pramukh") %></ItemTemplate>
+                        </asp:TemplateField>
+
+                        <asp:TemplateField HeaderText="Active Sah Sakti" SortExpression="total_active_sah_saktikendra_pramukh">
+                            <ItemTemplate><%# Eval("total_active_sah_saktikendra_pramukh") %></ItemTemplate>
+                        </asp:TemplateField>
+
+                        <asp:TemplateField HeaderText="Sah Booth Pramukh" SortExpression="total_sah_booth_pramukh">
+                            <ItemTemplate><%# Eval("total_sah_booth_pramukh") %></ItemTemplate>
+                        </asp:TemplateField>
+
+                        <asp:TemplateField HeaderText="Active Sah Booth Pramukh" SortExpression="total_active_sah_booth_pramukh">
+                            <ItemTemplate><%# Eval("total_active_sah_booth_pramukh") %></ItemTemplate>
+                        </asp:TemplateField>
+
+                        <asp:TemplateField HeaderText="Karykarta" SortExpression="total_karykarta">
+                            <ItemTemplate><%# Eval("total_karykarta") %></ItemTemplate>
+                        </asp:TemplateField>
+
+                        <asp:TemplateField HeaderText="Active Karykarta" SortExpression="total_active_karykarta">
+                            <ItemTemplate><%# Eval("total_active_karykarta") %></ItemTemplate>
                         </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="Phonebook User" SortExpression="phonebook_match_user">
                             <ItemTemplate><%# Eval("phonebook_match_user") %></ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Phonebook Voter" SortExpression="phonebook_match_voter">
-                            <ItemTemplate><%# Eval("phonebook_match_voter") %></ItemTemplate>
+                        <asp:TemplateField HeaderText="Phonebook Voter" SortExpression="phonebook_match_voters">
+                            <ItemTemplate><%# Eval("phonebook_match_voters") %></ItemTemplate>
                         </asp:TemplateField>
 
 

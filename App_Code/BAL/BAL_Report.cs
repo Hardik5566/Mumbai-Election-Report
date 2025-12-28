@@ -48,5 +48,21 @@ public class BAL_Report
         cmd.CommandText = "dis_survey_report_sp";
         return command.ExtQueryDS(cmd);
     }
+
+    public static DataSet booth_pramukh_creation_summary()
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandText = "booth_pramukh_creation_summary_sp";
+        return command.ExtQueryDS(cmd);
+    }
+
+    public static DataSet dis_ward_wise_booth_pramukh(string ward_no)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandText = "dis_ward_wise_booth_pramukh_sp";
+        parameter param = new parameter();
+        cmd.Parameters.Add(param.intparam("@ward_no", ward_no));
+        return command.ExtQueryDS(cmd);
+    }
 }
 

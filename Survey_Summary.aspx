@@ -35,7 +35,7 @@
             color: #063461 !important;
         }
 
-        .table td {
+        .table td, .table th {
             text-align: center !important;
             font-weight: bold;
         }
@@ -51,6 +51,7 @@
 
         <div class="ms-auto btn_header">
             <div class="btn-group">
+                <a href="Survey_Summary_Chart.aspx" class="btn btn-sm btn-primary btn_add">Survey Chart</a>&nbsp
                 <button type="button" class="btn btn-sm btn-danger btn_add" data-bs-toggle="modal" data-bs-target="#modal_add">Export</button>
             </div>
         </div>

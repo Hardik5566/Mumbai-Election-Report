@@ -143,10 +143,15 @@ from
 	tbl_booth_report
 end
 
+<<<<<<< Updated upstream
 --------------------------------
 --------Zone Wise Summary--------
 --------------------------------
 ALTER proc [dbo].[dis_zone_wise_user_summany_sp]
+=======
+
+alter proc dis_zone_wise_user_summany_sp
+>>>>>>> Stashed changes
 as
 begin
 ;with zn as
@@ -189,6 +194,32 @@ select
     sum(total_karykarta) AS karykarta,
     sum(total_active_karykarta) AS active_karykarta,
 
+<<<<<<< Updated upstream
+=======
+    -- Role-wise
+    SUM(admin) AS admin,
+	SUM(active_admin) AS active_admin,
+
+    SUM(sub_admin) AS sub_admin,
+	SUM(active_sub_admin) AS active_sub_admin,
+
+    SUM(sakti) AS sakti,
+	SUM(active_sakti) AS active_sakti,
+
+	SUM(sah_sakti) AS sah_sakti,
+	SUM(active_sah_sakti) AS active_sah_sakti,
+
+    SUM(booth_pramukh) AS booth_pramukh,
+	SUM(active_booth_pramukh) AS active_booth_pramukh,
+
+	SUM(sah_booth_pramukh) AS sah_booth_pramukh,
+	SUM(active_sah_booth_pramukh) AS active_sah_booth_pramukh,
+
+    SUM(karykarta) AS karykarta,
+	SUM(active_karykarta) AS active_karykarta,
+
+
+>>>>>>> Stashed changes
 	sum(phonebook_match_user) as phonebook_match_user,
 	sum(phonebook_match_voters) as phonebook_match_voter
 
@@ -222,6 +253,7 @@ order by
 	b.ward_no
 end
 
+<<<<<<< Updated upstream
 --------------------------------
 --------- Survey Report --------
 --------------------------------
@@ -244,4 +276,32 @@ where
 	and u.sub_type='BP'
 order by
 	cast(u.booth_javabdari as int)
+=======
+alter proc booth_pramukh_creation_summary_sp
+as
+begin
+;with booth as
+(
+select 
+	ward_no,
+	count(1) as total_booth 
+from 
+	tbl_booth_report
+group by
+	ward_no
+)  
+
+select 
+	b.ward_no,
+	b.total_booth,
+	u.booth_active as booth_pramukh,
+	u.active_booth_pramukh,
+	b.total_booth-u.booth_active as remain_booth,
+	(u.booth_active*100)/b.total_booth as booth_per
+from 
+	booth as b
+	left join tbl_user_summary as u on b.ward_no=u.ward_no
+order by
+	b.ward_no
+>>>>>>> Stashed changes
 end
