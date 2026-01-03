@@ -1,5 +1,48 @@
 ﻿use MumbaiReport
 
+------------------------------------
+----------Admin Login---------------
+------------------------------------
+alter PROCEDURE admin_login_sp
+(
+    @mobile_no VARCHAR(30),
+    @password  VARCHAR(1000)
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS
+    (
+        SELECT 1 
+        FROM tbl_admin
+        WHERE mobile_no = @mobile_no
+          AND password = @password
+          AND status = 1
+    )
+    BEGIN
+        -- Update last login time
+        UPDATE tbl_admin
+        SET last_login = dbo.get_date()
+        WHERE mobile_no = @mobile_no;
+
+        -- Return admin details
+        SELECT 
+            admin_id,
+            type,
+            name,
+            mobile_no,
+            zone_id,
+            last_login
+        FROM tbl_admin
+        WHERE mobile_no = @mobile_no;
+    END
+    
+END
+
+------------------------------------
+----------User Summary---------------
+------------------------------------
 alter PROCEDURE dis_user_summary_sp
 (
     @ward_no INT = 0
@@ -47,9 +90,6 @@ BEGIN
     ORDER BY ward_no;
 END
 
-
-
-
 --------------------------------
 --------Admin Dashboard--------
 --------------------------------
@@ -68,24 +108,28 @@ where
 
 
 ----------- Booth Report -------
-declare @total_booth int = (select sum(total_booth) from tbl_ward)
-;with booth as 
+DECLARE @total_booth INT =
 (
-	select
-		count(distinct booth_javabdari) as booth_Active 
-	from
-		tbl_users as u
-	where
-		u.sub_type='BP'
+    SELECT SUM(total_booth)
+    FROM tbl_ward
+);
+ 
+;WITH booth AS
+(
+    SELECT COUNT(*) AS booth_Active
+    FROM
+    (
+        SELECT DISTINCT booth_javabdari, ward_no
+        FROM tbl_users
+        WHERE sub_type = 'BP'
+          AND booth_javabdari IS NOT NULL
+    ) x
 )
-
-
-select 
-	@total_booth as total_booth,
-	b.booth_Active,
-	@total_booth-b.booth_Active as not_active_booth
-from 
-	booth as b
+SELECT
+    @total_booth AS total_booth,
+    b.booth_Active,
+    (@total_booth - b.booth_Active) AS not_active_booth
+FROM booth b;
 
 
 ----------- User Report -------
@@ -140,18 +184,24 @@ select
 	sum(doubtful) as doubtful,
 	sum(cant_say) as cant_say
 from
-	tbl_booth_report
+	tbl_booth_report;
+
+-------Star Volunteer-------------
+SELECT TOP 5
+	ward_no,
+    name,
+	photo,
+    total_log,
+    row_number() OVER (ORDER BY CAST(total_log AS INT) DESC) AS rank_no
+FROM tbl_start_vol
+ORDER BY CAST(total_log AS INT) DESC;
 end
 
-<<<<<<< Updated upstream
+
 --------------------------------
 --------Zone Wise Summary--------
 --------------------------------
 ALTER proc [dbo].[dis_zone_wise_user_summany_sp]
-=======
-
-alter proc dis_zone_wise_user_summany_sp
->>>>>>> Stashed changes
 as
 begin
 ;with zn as
@@ -194,32 +244,6 @@ select
     sum(total_karykarta) AS karykarta,
     sum(total_active_karykarta) AS active_karykarta,
 
-<<<<<<< Updated upstream
-=======
-    -- Role-wise
-    SUM(admin) AS admin,
-	SUM(active_admin) AS active_admin,
-
-    SUM(sub_admin) AS sub_admin,
-	SUM(active_sub_admin) AS active_sub_admin,
-
-    SUM(sakti) AS sakti,
-	SUM(active_sakti) AS active_sakti,
-
-	SUM(sah_sakti) AS sah_sakti,
-	SUM(active_sah_sakti) AS active_sah_sakti,
-
-    SUM(booth_pramukh) AS booth_pramukh,
-	SUM(active_booth_pramukh) AS active_booth_pramukh,
-
-	SUM(sah_booth_pramukh) AS sah_booth_pramukh,
-	SUM(active_sah_booth_pramukh) AS active_sah_booth_pramukh,
-
-    SUM(karykarta) AS karykarta,
-	SUM(active_karykarta) AS active_karykarta,
-
-
->>>>>>> Stashed changes
 	sum(phonebook_match_user) as phonebook_match_user,
 	sum(phonebook_match_voters) as phonebook_match_voter
 
@@ -235,7 +259,7 @@ end
 --------------------------------
 --------- Survey Report --------
 --------------------------------
-create proc dis_survey_report_sp
+ALTER proc [dbo].[dis_survey_report_sp]
 as
 begin
 select
@@ -252,12 +276,10 @@ group by
 order by
 	b.ward_no
 end
-
-<<<<<<< Updated upstream
---------------------------------
---------- Survey Report --------
---------------------------------
-create proc dis_ward_wise_booth_pramukh_sp
+------------------------------------
+---- Ward Wise booth Pramukh -------
+------------------------------------
+ALTER proc [dbo].[dis_ward_wise_booth_pramukh_sp]
 (
 	@ward_no int
 )
@@ -276,8 +298,12 @@ where
 	and u.sub_type='BP'
 order by
 	cast(u.booth_javabdari as int)
-=======
-alter proc booth_pramukh_creation_summary_sp
+end
+
+------------------------------------------
+---- booth Pramukh Creation Summary-------
+------------------------------------------
+ALTER proc [dbo].[booth_pramukh_creation_summary_sp]
 as
 begin
 ;with booth as
@@ -303,5 +329,7 @@ from
 	left join tbl_user_summary as u on b.ward_no=u.ward_no
 order by
 	b.ward_no
->>>>>>> Stashed changes
 end
+
+
+
