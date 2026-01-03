@@ -1,8 +1,8 @@
 use MumbaiReport
 -------------------------
 
-truncate table tbl_booth_report
-truncate table tbl_user_summary
+--truncate table tbl_booth_report
+--truncate table tbl_user_summary
 
 -------------------------
 ---- Booth Report -------
@@ -117,6 +117,43 @@ create table tbl_zone
 --('South Central Mumbai','143,144,145,146,147,148,150,152,153,154,155,172,173,174,175,176,179,180,181,177,178,200,201,182,190,191,192,194,183,184,185,186,187,188,189'),
 --('South Mumbai','193,195,196,197,198,199,202,203,204,205,206,207,208,209,210,211,212,214,215,217,218,219,213,216,220,223,221,222,224,225,226,227')
 
+--------------------------------------
+-------- Star Volunteer --------------
+--------------------------------------
+create table tbl_start_vol
+(
+	id int identity(1,1),
+	ward_no int,
+	admin_id int,
+	[name] nvarchar(100),
+	[type] varchar(10),
+	sub_type varchar(10),
+	mobile_no varchar(15),
+	photo nvarchar(1000),
+	booth_javabdari varchar(1000),
+	total_log bigint,
+	log_date datetime
+)
+--------------------------------------
+-------------Admin  --------------
+--------------------------------------
+create table tbl_admin
+(
+	admin_id int identity(1,1),
+	type varchar(30),
+	name nvarchar(1000),
+	mobile_no varchar(30),
+	password varchar(1000),
+	last_login datetime,
+	zone_id varchar(100),
+	status bit,
+	create_by int,
+	create_date datetime,
+	modify_by int,
+	modify_date datetime,
+	delete_by int,
+	delete_date datetime
+)
 
 --------------------------------------
 --------- Get Date Function-----------
@@ -128,3 +165,42 @@ begin
 	set @date=(select dateadd(hh,5,dateadd(mi,30,getutcdate())))
 	return @date
 end
+
+--------------------------------------
+----------- Insert Admin -------------
+--------------------------------------
+INSERT INTO tbl_admin
+(
+    type,
+    name,
+    mobile_no,
+    password,
+    last_login,
+    zone_id,
+    status,
+    create_by,
+    create_date,
+    modify_by,
+    modify_date,
+    delete_by,
+    delete_date
+)
+VALUES
+(
+    'A',
+    N'Hardik Vaghasiya',
+    '9909345328',
+    '123',
+    dbo.get_date(),
+    '0',
+    1,
+    0,
+    dbo.get_date(),
+    NULL,
+    NULL,
+    NULL,
+    NULL
+);
+
+
+

@@ -1,7 +1,8 @@
---exec get_user_bluepirnt_sp
---exec get_ward_blueprint_sp
---exec get_phonebook_blueprint_sp
 
+--exec get_user_bluepirnt_sp
+--exec sp_booth_summary
+--exec get_phonebook_blueprint_sp
+--exec get_start_vol_blueprint_sp
 ----------------------------------------
 ------------User Blueprint-------------
 ----------------------------------------
@@ -54,12 +55,14 @@ TRUNCATE TABLE MumbaiReport.dbo.tbl_users;
       AND TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL;
 
     EXEC sp_executesql @sql;
+
+	select 'ok'
 end
 
 ----------------------------------------
 ------------Ward Blueprint-------------
 ----------------------------------------
-create proc get_ward_blueprint_sp
+alter proc get_ward_blueprint_sp
 as
 begin
 	TRUNCATE TABLE MumbaiReport.dbo.tbl_ward;
@@ -88,13 +91,73 @@ begin
 	  AND TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL;
 	
 	EXEC sp_executesql @sql;
-
+	select 'ok'
 end
 
 ----------------------------------------
+--------- Survey Blueprint------------
+----------------------------------------
+ALTER PROC dbo.sp_booth_summary
+AS
+BEGIN
+    SET NOCOUNT ON;
+ 
+    TRUNCATE TABLE dbo.tbl_booth_report;
+ 
+    DECLARE @i INT = 1;
+    DECLARE @sql NVARCHAR(MAX);
+ 
+    WHILE @i <= 227
+    BEGIN
+        SET @sql = N'
+        INSERT INTO dbo.tbl_booth_report
+        (
+            ward_no,
+            booth_no,
+            total_voter,
+            survey_done,
+            positive,
+            negative,
+            doubtful,
+            cant_say,
+            created_on
+        )
+        SELECT
+            ' + CAST(@i AS NVARCHAR(5)) + ' AS ward_no,
+            b.booth_no,
+            b.total_voter,
+ 
+            ISNULL(s.total,0) AS survey_done,
+            ISNULL(s.P,0) AS positive,
+            ISNULL(s.N,0) AS negative,
+            ISNULL(s.D,0) AS doubtful,
+            ISNULL(s.C,0) AS cant_say,
+ 
+            GETDATE()
+        FROM ' + QUOTENAME('mumbai' + CAST(@i AS NVARCHAR(5))) + '.dbo.tbl_booth b
+        LEFT JOIN
+        (
+            SELECT
+                booth_no,
+                COUNT(*) AS total,
+                SUM(CASE WHEN voter_status = ''P'' THEN 1 ELSE 0 END) AS P,
+                SUM(CASE WHEN voter_status = ''N'' THEN 1 ELSE 0 END) AS N,
+                SUM(CASE WHEN voter_status = ''D'' THEN 1 ELSE 0 END) AS D,
+                SUM(CASE WHEN voter_status = ''C'' THEN 1 ELSE 0 END) AS C
+            FROM ' + QUOTENAME('mumbai' + CAST(@i AS NVARCHAR(5))) + '.dbo.get_uniq_survey_view
+            WHERE voter_available = 1
+            GROUP BY booth_no
+        ) s ON s.booth_no = b.booth_no;
+        ';
+ 
+        EXEC sp_executesql @sql;
+        SET @i += 1;
+    END
+END
+----------------------------------------
 ---------phonebook Blueprint------------
 ----------------------------------------
-create proc get_phonebook_blueprint_sp
+alter proc get_phonebook_blueprint_sp
 as
 begin
 TRUNCATE TABLE MumbaiReport.dbo.tbl_phonebook;
@@ -123,4 +186,73 @@ TRUNCATE TABLE MumbaiReport.dbo.tbl_phonebook;
 	  AND TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL;
 	
 	EXEC sp_executesql @sql;
+
+	select 'ok'
 end
+
+----------------------------------------
+--------- Star Volunteer ------------
+----------------------------------------
+alter PROC dbo.get_start_vol_blueprint_sp
+AS
+BEGIN
+    SET NOCOUNT ON;
+ 
+    -- Clear old data
+    TRUNCATE TABLE MumbaiReport.dbo.tbl_start_vol;
+ 
+    DECLARE @wards VARCHAR(MAX) =
+    '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50';
+ 
+    DECLARE @sql NVARCHAR(MAX) = N'';
+ 
+    SELECT @sql = @sql + '
+    ;WITH lg AS
+    (
+        SELECT
+            l.user_id,
+            COUNT(1) AS total_log
+        FROM
+            mumbai' + LTRIM(RTRIM(value)) + '.dbo.get_uniq_log_view AS l
+        GROUP BY
+            l.user_id
+    )
+    INSERT INTO MumbaiReport.dbo.tbl_start_vol
+    (
+        ward_no,
+        admin_id,
+        [name],
+        [type],
+        sub_type,
+        mobile_no,
+        photo,
+        booth_javabdari,
+        total_log,
+        log_date
+    )
+    SELECT TOP 5
+        ' + LTRIM(RTRIM(value)) + ' AS ward_no,
+        a.admin_id,
+        a.name,
+        a.type,
+        a.sub_type,
+        a.mobile_no,
+        a.photo,
+        a.booth_javabdari,
+        lg.total_log,
+        MumbaiReport.dbo.get_date()
+    FROM
+        lg
+        JOIN mumbai' + LTRIM(RTRIM(value)) + '.dbo.tbl_admin AS a
+            ON a.admin_id = lg.user_id
+           AND a.status = 1
+    ORDER BY
+        lg.total_log DESC;
+    '
+    FROM STRING_SPLIT(@wards, ',')
+    WHERE TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL;
+ 
+    EXEC sp_executesql @sql;
+
+	select 'ok'
+END
